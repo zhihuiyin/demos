@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas示例</title>
+    <link rel="stylesheet" href="../commons/response_style.css">
+    <style>
+        html {
+            width: 100%;
+            height: 100%;
+        }
+
+        .body-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            height: 32rem;
+        }
+
+        .canvas-container {
+            margin: 1rem 1rem 0 1rem;
+            max-width: 45rem;
+            min-width: 20rem;
+            min-height: 10rem;
+            max-height: 25rem;
+            background-color: rgba(240, 240, 240, 0.5);
+            box-shadow: 2px 2px 30px rgba(0,0,0,0.2);
+        }
+
+        .myCanvas {
+            height: auto;
+            width: 100%;
+            /* background-color: #fff; */
+        }
+
+        .set-container {
+            width: 25rem;
+            height: 400px;
+            padding: 1rem 0 0 1rem;
+
+        }
+
+        .span_attr {
+            display: inline-block;
+            width: 1rem;
+            text-align: center;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js" onload="console.log('hello vue')"></script>
+    <script src="./asynload.js"></script>
+</head>
+
+<body>
+    <div class="body-container">
+        <div class="canvas-container">
+            <canvas class="myCanvas" id="myCanvas" onmousedown="mousedown(event);" height="400" width="600" >浏览器不支持Canvas,请升级或改用谷歌浏览器！</canvas>
+        </div>
+        <div id="app" class="set-container">
+            <h3>参数设置</h3>
+            <br>
+            <form report-submit="" bindsubmit="" bindreset="">
+                <!--  oninput="huizhi()" -->
+                颜色：&nbsp;
+                <input type="color" name="color" id="color" v-model="color">
+                <br>
+                <br> 选择形状：
+                <input type="radio" name="gender" value="0" v-model="picked"> 多角星形
+                <input type="radio" name="gender" value="1" v-model="picked"> 多边形
+                <br>
+                <br> 顶点数：
+                <span class="span_attr">{{apexNum}}</span>个 &nbsp;
+                <input type="range" name="points" min="6" max="100" v-model="rangeNum">
+                <br>
+                <br> 图形半径：
+                <span class="span_attr">{{radius}}</span>&nbsp; &nbsp;px&nbsp;
+                <input type="range" name="radius" min="1" max="200" v-model="radius">
+                <br>
+                <br> 图形中心点位置：
+                <br> 左偏移：
+                <span class="span_attr">{{circle_x}}</span>&nbsp; &nbsp;px &nbsp;&nbsp;
+                <input type="range" name="circle_x" min="1" max="600" v-model="circle_x">
+                <br> 下偏移：
+                <span class="span_attr">{{circle_y}}</span>&nbsp; &nbsp;px &nbsp;&nbsp;
+                <input type="range" name="circle_y" min="1" max="400" v-model="circle_y">
+                <br>
+                <!-- 画布大小： 
+                <br>
+                长{{canvas_width}}px &nbsp;<input type="range" name="canvas_width" min="0" max="600" v-model="c_width">
+                <br>
+                宽{{canvas_height}}px &nbsp;<input type="range" name="canvas_height" min="0" max="300" v-model="c_height">
+                <br>
+                <br> -->
+            </form>
+        </div>
+    </div>
+    <script src="./draw.js">
+        draw.js引入失败
+    </script>
+    <script>
+        var myCanvas = document.getElementById('myCanvas');
+
+        window.onresize = function (params) {
+            // var screen = window.screen;
+            console.log(myCanvas.offsetTop, myCanvas.offsetLeft, myCanvas.offsetHeight, myCanvas.offsetWidth);
+        }
+        // var canvas_width = canvas.width;
+        // var canvas_height = canvas.height;
+
+        function mousedown(e) {
+            console.log('mousedown',e)
+        }
+
+        var Draw = new window.Draw({});
+        console.log(Draw)
+        Draw._init({});
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                color: '#ff0000',
+                picked: 0,
+                apexNum: 5,
+                rangeNum: 1,
+                lineWidth: 1,
+                radius: 150,
+                circle_x: 300,
+                circle_y: 200,
+                // c_width:0,
+                // c_height:0,
+            },
+            methods: {
+                huizhi: function () { //从新绘制图形
+                    // console.log('huizhi');
+                    Draw.polygon = {
+                        n: this.apexNum,
+                        type: this.picked - 0
+                    };
+                    Draw.circle = {
+                        x: this.circle_x - 0,
+                        y: this.circle_y - 0,
+                        r: this.radius - 0
+                    };
+                    Draw._setStyle({
+                        strokeStyle: this.color,
+                        lineWidth: this.lineWidth
+                    });
+                    Draw._drawPolygon({});
+                }
+            },
+            watch: {
+                color: function (val) {
+                    this.color = val;
+                    this.huizhi();
+                },
+                picked: function (val) {
+                    this.picked = val;
+                    this.huizhi();
+                },
+                rangeNum: function (val) {
+                    this.apexNum = Math.ceil(val / 2);
+                    this.huizhi();
+                },
+                radius: function (val) {
+                    this.radius = val;
+                    this.huizhi();
+                },
+                // c_width:function(val){
+                //     console.log(val);
+                //     this.c_width = val - 0;
+                //     canvas.width = this.c_width + 300;
+                // },
+                // c_height:function(val){
+                //     console.log(val);
+                //     this.c_height = val - 0;
+                //     canvas.height = this.c_height + 150;
+                // },
+                circle_x: function (val) {
+                    this.circle_x = val;
+                    this.huizhi();
+                },
+                circle_y: function (val) {
+                    this.circle_y = val;
+                    this.huizhi();
+                },
+            },
+            beforeCreate:function(){//节点创建前
+                console.log('beforeCreate')
+            },
+            created: function () {
+                console.log('vue app created');
+                this.huizhi(); //首次加载默认执行一次
+
+            },
+            beforeMount:function(){
+                console.log('beforeMount')
+            },
+            mounted:function(){
+                console.log('mounted')
+            },
+            beforeUpdate:function(){
+                console.log('beforeUpdate',this)
+            },
+            updated:function(){
+                console.log('updated',this)
+            },
+            computed: {
+                // canvas_width() {
+                //     return this.c_width + 300
+                // },
+                // canvas_height() {
+                //     return this.c_height + 150
+                // }
+            }
+        })
+    </script>
+    <script src="../commons/jsplugin.js"></script>
+</body>
+
+</html>
